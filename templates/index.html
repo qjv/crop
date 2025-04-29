@@ -1,24 +1,12 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <title>Image Cropper to WebP</title>
   <style>
     body { font-family: sans-serif; }
-    .dropzone {
-      border: 2px dashed #ccc;
-      border-radius: 10px;
-      padding: 40px;
-      text-align: center;
-      color: #888;
-      margin: 20px auto;
-      width: 300px;
-    }
-    .dropzone.dragover {
-      background-color: #f0f0f0;
-      border-color: #666;
-      color: #333;
-    }
+    .images-container { display: flex; justify-content: space-around; margin-top: 20px; }
+    .image-box { text-align: center; }
+    img { max-width: 300px; margin: 10px; }
   </style>
 </head>
 <body>
@@ -28,10 +16,25 @@
     <input type="file" id="fileInput" name="image" accept="image/*" required>
   </form>
 
-  {% if filename %}
-    <h2>Done!</h2>
-    <p><a href="{{ url_for('download', filename=filename) }}">Download your cropped WebP image</a></p>
-    <img src="{{ url_for('static', filename='output/' + filename) }}" width="300">
+  {% if original_filename %}
+    <h2>Comparison of Original and Cropped Image</h2>
+    <div class="images-container">
+      <div class="image-box">
+        <h3>Original Image</h3>
+        <img src="{{ url_for('static', filename='output/' + original_filename) }}" alt="Original Image">
+        <p><a href="{{ url_for('download', filename=original_filename) }}">Download Original</a></p>
+      </div>
+      <div class="image-box">
+        <h3>Cropped Image</h3>
+        <img src="{{ url_for('static', filename='output/' + cropped_filename) }}" alt="Cropped Image">
+        <p><a href="{{ url_for('download', filename=cropped_filename) }}">Download Cropped</a></p>
+      </div>
+      <div class="image-box">
+        <h3>Cropped Image with Border</h3>
+        <img src="{{ url_for('static', filename='output/' + cropped_with_border_filename) }}" alt="Cropped with Border">
+        <p><a href="{{ url_for('download', filename=cropped_with_border_filename) }}">Download Cropped with Border</a></p>
+      </div>
+    </div>
   {% endif %}
 
   <script>
