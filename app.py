@@ -3,10 +3,36 @@ from PIL import Image, ImageOps
 import os
 from io import BytesIO
 import uuid
+import schedule
+import time
+import threading
 
 app = Flask(__name__)
 UPLOAD_FOLDER = "static/output"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Cleanup function to remove all files in the output folder
+def cleanup_output_folder():
+    """Clears files in the static/output folder."""
+    for filename in os.listdir(UPLOAD_FOLDER):
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print(f"Deleted {file_path}")
+
+# Set the cleanup to run every 1 hour (or adjust the interval)
+schedule.every(1).hour.do(cleanup_output_folder)
+
+def run_schedule():
+    """Run the scheduled tasks in the background."""
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+# Start the cleanup scheduler in a separate thread
+cleanup_thread = threading.Thread(target=run_schedule)
+cleanup_thread.daemon = True
+cleanup_thread.start()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -32,8 +58,7 @@ def index():
                                    cropped_filename=cropped_filename)
     return render_template("index.html", 
                            original_filename=None, 
-                           cropped_filename=None, 
-                           cropped_with_border_filename=None)
+                           cropped_filename=None)
 
 @app.route("/download/<filename>")
 def download(filename):
