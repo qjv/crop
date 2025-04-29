@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Cropper to WebP</title>
+  <style>
+    body { font-family: sans-serif; }
+    .dropzone {
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      color: #888;
+      margin: 20px auto;
+      width: 300px;
+    }
+    .dropzone.dragover {
+      background-color: #f0f0f0;
+      border-color: #666;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Drag & Drop or Upload an Image</h1>
+  <div class="dropzone" id="dropzone">Drop image here or click to upload</div>
+  <form id="uploadForm" method="POST" enctype="multipart/form-data" style="display:none;">
+    <input type="file" id="fileInput" name="image" accept="image/*" required>
+  </form>
+
+  {% if filename %}
+    <h2>Done!</h2>
+    <p><a href="{{ url_for('download', filename=filename) }}">Download your cropped WebP image</a></p>
+    <img src="{{ url_for('static', filename='output/' + filename) }}" width="300">
+  {% endif %}
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const form = document.getElementById('uploadForm');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length) {
+        fileInput.files = files;
+        form.submit();
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) form.submit();
+    });
+  </script>
+</body>
+</html>
