@@ -3,6 +3,7 @@ from PIL import Image, ImageOps
 import os
 from io import BytesIO
 import uuid
+import requests
 import schedule
 import time
 import threading
@@ -34,28 +35,42 @@ cleanup_thread = threading.Thread(target=run_schedule)
 cleanup_thread.daemon = True
 cleanup_thread.start()
 
+def fetch_image_from_url(url):
+    """Fetch an image from a URL and return it as a PIL Image."""
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content))
+    return img
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        file = request.files["image"]
+        file = request.files.get("image")
+        image_url = request.form.get("image_url")
+
         if file:
             img = Image.open(file.stream)
-            original = img.copy()  # Save original image
-            
-            xs, ys = img.size
-            cropx, cropy = 26, 26
-            cropped = img.crop((cropx, cropy, xs - cropx, ys - cropy))
+        elif image_url:
+            img = fetch_image_from_url(image_url)
+        else:
+            return render_template("index.html", error="Please upload an image or provide an image URL.")
 
-            # Save images with unique filenames
-            original_filename = f"{uuid.uuid4().hex}_original.png"
-            cropped_filename = f"{uuid.uuid4().hex}_cropped.png"
-            
-            original.save(os.path.join(UPLOAD_FOLDER, original_filename))
-            cropped.save(os.path.join(UPLOAD_FOLDER, cropped_filename))
+        # Process image (crop and save)
+        original = img.copy()  # Save original image
+        
+        xs, ys = img.size
+        cropx, cropy = 26, 26
+        cropped = img.crop((cropx, cropy, xs - cropx, ys - cropy))
 
-            return render_template("index.html", 
-                                   original_filename=original_filename, 
-                                   cropped_filename=cropped_filename)
+        # Save images with unique filenames
+        original_filename = f"{uuid.uuid4().hex}_original.png"
+        cropped_filename = f"{uuid.uuid4().hex}_cropped.png"
+        
+        original.save(os.path.join(UPLOAD_FOLDER, original_filename))
+        cropped.save(os.path.join(UPLOAD_FOLDER, cropped_filename))
+
+        return render_template("index.html", 
+                               original_filename=original_filename, 
+                               cropped_filename=cropped_filename)
     return render_template("index.html", 
                            original_filename=None, 
                            cropped_filename=None)
