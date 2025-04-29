@@ -8,10 +8,6 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "static/output"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-def add_border(image, border_color=(0, 0, 0)):
-    """Adds a black border to the image"""
-    return ImageOps.expand(image, border=10, fill=border_color)
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -24,22 +20,16 @@ def index():
             cropx, cropy = 26, 26
             cropped = img.crop((cropx, cropy, xs - cropx, ys - cropy))
 
-            # Add black border around the cropped image
-            cropped_with_border = add_border(cropped)
-
             # Save images with unique filenames
             original_filename = f"{uuid.uuid4().hex}_original.png"
-            cropped_filename = f"{uuid.uuid4().hex}_cropped.webp"
-            cropped_with_border_filename = f"{uuid.uuid4().hex}_cropped_with_border.webp"
+            cropped_filename = f"{uuid.uuid4().hex}_cropped.png"
             
             original.save(os.path.join(UPLOAD_FOLDER, original_filename))
             cropped.save(os.path.join(UPLOAD_FOLDER, cropped_filename))
-            cropped_with_border.save(os.path.join(UPLOAD_FOLDER, cropped_with_border_filename), "WEBP")
 
             return render_template("index.html", 
                                    original_filename=original_filename, 
-                                   cropped_filename=cropped_filename,
-                                   cropped_with_border_filename=cropped_with_border_filename)
+                                   cropped_filename=cropped_filename)
     return render_template("index.html", 
                            original_filename=None, 
                            cropped_filename=None, 

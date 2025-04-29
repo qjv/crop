@@ -20,19 +20,14 @@
     <h2>Comparison of Original and Cropped Image</h2>
     <div class="images-container">
       <div class="image-box">
-        <h3>Original Image</h3>
-        <img src="{{ url_for('static', filename='output/' + original_filename) }}" alt="Original Image">
-        <p><a href="{{ url_for('download', filename=original_filename) }}">Download Original</a></p>
+      <h3>Original Image</h3>
+      <img src="{{ url_for('static', filename='output/' + original_filename) }}" alt="Original Image" style="outline: 2px solid black;">
+      <p><a href="{{ url_for('download', filename=original_filename) }}">Download Original</a></p>
       </div>
       <div class="image-box">
-        <h3>Cropped Image</h3>
-        <img src="{{ url_for('static', filename='output/' + cropped_filename) }}" alt="Cropped Image">
-        <p><a href="{{ url_for('download', filename=cropped_filename) }}">Download Cropped</a></p>
-      </div>
-      <div class="image-box">
-        <h3>Cropped Image with Border</h3>
-        <img src="{{ url_for('static', filename='output/' + cropped_with_border_filename) }}" alt="Cropped with Border">
-        <p><a href="{{ url_for('download', filename=cropped_with_border_filename) }}">Download Cropped with Border</a></p>
+      <h3>Cropped Image</h3>
+      <img src="{{ url_for('static', filename='output/' + cropped_filename) }}" alt="Cropped Image" style="outline: 2px solid black;">
+      <p><a href="{{ url_for('download', filename=cropped_filename) }}">Download Cropped</a></p>
       </div>
     </div>
   {% endif %}
